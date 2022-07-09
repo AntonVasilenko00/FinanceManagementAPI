@@ -68,6 +68,7 @@ export class UsersController {
   }
 
   @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiConflictResponse({ description: 'Duplicate username or email' })
   @ApiBadRequestResponse({ description: 'Failed to update user' })
   @Patch(':id')
   async update(
