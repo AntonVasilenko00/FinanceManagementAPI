@@ -8,6 +8,8 @@ import swaggerConfig, { swaggerDocsUrl } from './config/swagger.config'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
+  app.enableCors()
+
   const document = SwaggerModule.createDocument(app, swaggerConfig)
   SwaggerModule.setup(swaggerDocsUrl, app, document)
 
