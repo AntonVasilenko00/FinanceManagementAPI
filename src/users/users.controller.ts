@@ -55,7 +55,7 @@ export class UsersController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     try {
-      const user = await this.usersService.findOne(+id)
+      const user = await this.usersService.findOneById(+id)
 
       if (!user) throw new NotFoundException(`User with id ${id} not found`)
 
@@ -107,7 +107,7 @@ export class UsersController {
     }
   }
 
-  private handleUniqueValuesError(
+  public handleUniqueValuesError(
     error: any,
     dto: CreateUserDto | UpdateUserDto,
   ) {

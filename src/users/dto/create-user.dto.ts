@@ -43,5 +43,5 @@ export class CreateUserDto {
     message: `Invalid role, allowed values: ${Object.values(Role)}`,
   })
   @IsOptional()
-  role: Role = Role.USER
+  role?: Role = Role.USER
 }

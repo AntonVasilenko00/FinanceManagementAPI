@@ -43,13 +43,13 @@ export class User {
   lastName: string
 
   @ApiProperty({ enum: Role })
-  @Column()
-  role: string
+  @Column({ type: 'varchar' })
+  role: Role
 
   @BeforeInsert()
   @BeforeUpdate()
   hashPassword(password?: string): string {
-    this.password = bcrypt.hashSync(password, 10)
+    this.password = bcrypt.hashSync(password || this.password, 10)
     return this.password
   }
 
