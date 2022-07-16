@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseFilters } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiConflictResponse, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { UserExceptionFilter } from 'src/users/filters/user.exception-filter'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
@@ -12,6 +12,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @ApiConflictResponse({ description: 'Duplicate username or email' })
   @UseFilters(new UserExceptionFilter())
   async signup(@Body() signupDto: SignupDto): Promise<TokenDto> {
     return this.authService.signup(signupDto)
