@@ -11,6 +11,8 @@ import {
   HttpException,
   ConflictException,
   BadRequestException,
+  ParseIntPipe,
+  UseFilters,
 } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -23,9 +25,11 @@ import {
 } from '@nestjs/swagger'
 
 import { User } from './entities/user.entity'
+import { UserExceptionFilter } from './filters/user.exception-filter'
 
 @ApiTags('Users')
 @Controller('users')
+@UseFilters(new UserExceptionFilter())
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -33,16 +37,7 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Failed to create user' })
   @Post()
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    try {
-      return await this.usersService.create(createUserDto)
-    } catch (error) {
-      this.handleUniqueValuesError(error, createUserDto)
-
-      throw new HttpException(
-        error.detail || error.message || 'Failed to create user',
-        HttpStatus.BAD_REQUEST,
-      )
-    }
+    return await this.usersService.create(createUserDto)
   }
 
   @Get()
@@ -53,18 +48,21 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiBadRequestResponse({ description: 'Failed to find user' })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
-    try {
-      const user = await this.usersService.findOneById(+id)
+  async findOne(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException('id param must be a number'),
+      }),
+    )
+    id: string,
+  ): Promise<User> {
+    const user = await this.usersService.findOneById(+id)
 
-      if (!user) throw new NotFoundException(`User with id ${id} not found`)
+    if (!user) throw new NotFoundException(`User with id ${id} not found`)
 
-      return user
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error
-
-      throw new HttpException('Invalid param id', HttpStatus.BAD_REQUEST)
-    }
+    return user
   }
 
   @ApiNotFoundResponse({ description: 'User not found' })
@@ -74,48 +72,30 @@ export class UsersController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    try {
-      const user = await this.usersService.update(+id, updateUserDto)
+    const user = await this.usersService.update(+id, updateUserDto)
 
-      if (!user) throw new NotFoundException(`User with id ${id} not found`)
+    if (!user) throw new NotFoundException(`User with id ${id} not found`)
 
-      return user
-    } catch (error) {
-      this.handleUniqueValuesError(error, updateUserDto)
-      if (error instanceof NotFoundException) throw error
-
-      console.log(error)
-
-      throw new BadRequestException('Invalid param id')
-    }
+    return user
   }
 
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiBadRequestResponse({ description: 'Failed to delete user' })
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<string> {
-    try {
-      const { affected } = await this.usersService.remove(+id)
+  async remove(
+    @Param(
+      'id',
+      new ParseIntPipe({
+        exceptionFactory: () =>
+          new BadRequestException('id param must be a number'),
+      }),
+    )
+    id: string,
+  ): Promise<string> {
+    const { affected } = await this.usersService.remove(+id)
 
-      if (!affected) throw new NotFoundException(`User with id ${id} not found`)
+    if (!affected) throw new NotFoundException(`User with id ${id} not found`)
 
-      return `User with id ${id} deleted`
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error
-
-      throw new HttpException('Invalid param id', HttpStatus.BAD_REQUEST)
-    }
-  }
-
-  public handleUniqueValuesError(
-    error: any,
-    dto: CreateUserDto | UpdateUserDto,
-  ) {
-    if (error.code === '23505') {
-      if (error.detail.includes(dto.email))
-        throw new ConflictException('User with such email already exists')
-      if (error.detail.includes(dto.username))
-        throw new ConflictException('User with such username already exists')
-    }
+    return `User with id ${id} deleted`
   }
 }
