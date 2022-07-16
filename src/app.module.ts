@@ -4,7 +4,8 @@ import { ApiTags } from '@nestjs/swagger'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './users/users.module'
+import { AuthModule } from './auth/auth.module'
 import dbConfig from './config/db.config'
 
 @Module({
@@ -12,6 +13,7 @@ import dbConfig from './config/db.config'
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(dbConfig),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
