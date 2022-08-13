@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UseFilters } from '@nestjs/common'
 import { ApiConflictResponse, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { UserExceptionFilter } from 'src/users/filters/user.exception-filter'
+import { UserExceptionFilter } from '../users/filters/user.exception-filter'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { SignupDto } from './dto/signup.dto'

@@ -1,4 +1,4 @@
-import { Role } from 'src/users/roles'
+import { Role } from '../../users/roles'
 
 export type Payload = {
   sub: number

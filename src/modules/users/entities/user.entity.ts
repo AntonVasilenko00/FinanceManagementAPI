@@ -3,11 +3,14 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import * as bcrypt from 'bcrypt'
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger'
 import { Role } from '../roles'
+import { Transaction } from '../../transactions/entities/transaction.entity'
+import { Account } from 'src/modules/accounts/entities/account.entity'
 
 @Entity()
 export class User {
@@ -43,8 +46,22 @@ export class User {
   lastName: string
 
   @ApiProperty({ enum: Role })
-  @Column({ type: 'varchar' })
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role
+
+  @ApiHideProperty()
+  @OneToMany((type) => Transaction, (transaction) => transaction.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  transactions: Transaction[]
+
+  @ApiHideProperty()
+  @OneToMany((type) => Account, (account) => account.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  accounts: Account[]
 
   @BeforeInsert()
   @BeforeUpdate()

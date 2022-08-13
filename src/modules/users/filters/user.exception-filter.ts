@@ -30,6 +30,12 @@ export class UserExceptionFilter implements ExceptionFilter {
       }
     }
 
-    return response
+    console.log(exception)
+
+    return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Unknown user error',
+      error: 'Unknown',
+    })
   }
 }

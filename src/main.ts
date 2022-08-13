@@ -1,7 +1,6 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule } from '@nestjs/swagger'
-import { config } from 'rxjs'
 import { AppModule } from './app.module'
 import appConfig from './config/app.config'
 import swaggerConfig, { swaggerDocsUrl } from './config/swagger.config'
